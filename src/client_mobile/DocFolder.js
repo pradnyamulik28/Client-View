@@ -31,42 +31,6 @@ const DocFolder = () => {
   };
 
 
-
-  const sendCountData = async (year) => {
-
-    const shortYear = year.toString().slice(-2);
-    const yearRange = `${year - 1}-${shortYear}`;
-
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", `Bearer ${storedToken}`);
-
-    const raw = JSON.stringify({
-      "userid": user_id,
-      "clientid": id,
-      "accountyear": yearRange,
-      "filednotfiled": "No"
-    });
-
-    const requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: raw,
-      redirect: 'follow'
-    };
-
-    try {
-      const response = await fetch(`${url_}/saveData`, requestOptions);
-      const result = await response.text();
-      console.log("Save data ",result);
-
-    } catch (error) {
-      console.error('An error occurred while sending count data:', error);
-    }
-
-    console.log(yearRange)
-  };
-
   return (
     <div className="container">
       <div className="row" >
@@ -77,7 +41,7 @@ const DocFolder = () => {
               <div key={index} className="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
                 <Link to={`/viewfile`}  
                 className={`${styles.linktab}`} 
-                state={{clientid:"1",year:`${year - 1}-${year.toString().slice(-2)}`}}> {/* Pass the year to SendData */}
+                state={{clientid:id,year:`${year - 1}-${year.toString().slice(-2)}`}}> {/* Pass the year to SendData */}
                   <div className={`${styles.card} ${styles[`card${index + 1}`]}`} id={styles.card1}>
                     <div className={styles.icon}>
                       <p className={styles.icons}>
