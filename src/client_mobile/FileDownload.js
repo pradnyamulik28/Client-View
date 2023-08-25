@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import style from "./FileView.module.css";
 import upload from './upload.png';
-import Swal from 'sweetalert';
-import { useLocation } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { useParams } from 'react-router-dom';
 import { url_ } from '../Config';
+import { useLocation } from 'react-router-dom';
+
+
 
 
 const FileDownload = () => {
-  const  id  = useLocation().state.clientid;
+
+const  id  = useLocation().state.clientid;
   const user_id = window.localStorage.getItem('user_id');
   const storedToken = window.localStorage.getItem('jwtToken');
   const  year  = useLocation().state.year;
 
-//console.log(" client id : ",id,"year :",year)
+ // console.log(year,id)
+
+
   const [codeVisible, setCodeVisible] = useState(false);
   const [fileResponse, setFileResponse] = useState(false);
   const [dbfilename, setDbfilename] = useState([]);
@@ -43,6 +49,14 @@ const FileDownload = () => {
     }
   };
 
+
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //  Fetch file Code
+
+
   const getFile = async () => {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${storedToken}`);
@@ -71,6 +85,33 @@ const FileDownload = () => {
     }
   };
 
+
+  const filenameStatusArray = originalfilename.map(filename => {
+    const matchingFile = dbfilename.find(file => {
+      return file.extractedName === filename || file.fileid.toString() === filename;
+    });
+
+    if (matchingFile) {
+      return { filename, status: true, fileId: matchingFile.fileid, filePath: matchingFile.filePath };
+    } else {
+      return { filename, status: false };
+    }
+  });
+
+
+
+
+
+
+
+
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //  Toggle Switch Code
+
+
   const GetFileResponse = async () => {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${storedToken}`);
@@ -95,35 +136,6 @@ const FileDownload = () => {
       console.error('An error occurred while fetching files:', error);
     }
   };
-
-
-
-  const filenameStatusArray = originalfilename.map(filename => {
-    const matchingFile = dbfilename.find(file => {
-      return file.extractedName === filename || file.fileid.toString() === filename;
-    });
-
-    if (matchingFile) {
-      return { filename, status: true, fileId: matchingFile.fileid, filePath: matchingFile.filePath };
-    } else {
-      return { filename, status: false };
-    }
-  });
-
-
-
-
-
-
-
-
-
-  const toggleCodeVisibility = () => {
-    setCodeVisible(!codeVisible);
-  };
-
-
-/* --------------------Delete Later
 
   const handleToggle = async () => {
     if (fileResponse === true) {
@@ -169,214 +181,72 @@ const FileDownload = () => {
       }
     }
   };
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const handleFileUpload = async (event, filename) => {
-    const file = event.target.files[0];
+  //  Select button code
 
-    if (file) {
-      if (filename.toLowerCase().includes('excel')) {
-        if (file.name.endsWith('.xlsx')) {
-
-          FileUpload(file, filename);
-        } else {
-          Swal.fire(
-            'Invalid File Type!',
-            "Please select a valid file type (XLSX).",
-            "error"
-          );
-        }
-      } else if (file.name.endsWith('.pdf')) {
-
-        FileUpload(file, filename);
-      } else {
-        Swal.fire(
-          'Invalid File Type!',
-          "Please select a valid file type (PDF).",
-          "error"
-        );
-      }
-    } else {
-      console.log("No file selected");
-    }
+  const toggleCodeVisibility = () => {
+    setCodeVisible(!codeVisible);
   };
 
-  async function FileUpload(file, filename) {
-
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, confirm!'
-    });
-
-    if (result.isConfirmed) {
-
-
-      const myHeaders = new Headers();
-      myHeaders.append("Authorization", `Bearer ${storedToken}`);
-
-      const formdata = new FormData();
-      formdata.append("file", file);
-      formdata.append("userid", user_id);
-      formdata.append("clientid", id);
-      formdata.append("accountyear", year);
-      formdata.append("filename", filename);
-
-      const requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: formdata,
-        redirect: 'follow'
-      };
-
-      try {
-        const response = await fetch(`${url_}/upload`, requestOptions);
-        const responseData = await response.text();
-        console.log(responseData)
-        if (response.status === 200) {
-          await Swal.fire(
-            'Success.',
-            `${responseData}`,
-            'success'
-          )
-          window.location.reload();
-
-        } else {
-          Swal.fire(
-            'Failed!',
-            `${responseData}`,
-            'error'
-          )
-        }
-      } catch (error) {
-        console.log('Error:', error);
-        if (error.response) {
-          console.log('Response Status:', error.response.status);
-          console.log('Response Data:', await error.response.text());
-        }
-      }
-    } else {
-      console.log("Upload is canceled.");
-      window.location.reload();
-    }
-  }
-
-
-
-
-
-
-
-
-  const DeleteFile = async () => {
-
-
-    try {
-      const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, confirm!'
-      });
-
-      if (result.isConfirmed) {
-
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("Authorization", `Bearer ${storedToken}`);
-
-        var raw = JSON.stringify(selectedFiles);
-
-        var requestOptions = {
-          method: 'DELETE',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'
-        };
-
-
-        const response = await fetch(`${url_}/deletefile`, requestOptions);
-        const responseData = await response.text();
-        console.log(responseData)
-        if (response.status === 200) {
-          await Swal.fire(
-            'Success.',
-            `${responseData}`,
-            'success'
-          )
-          window.location.reload();
-
-        } else {
-          Swal.fire(
-            'Failed!',
-            `${responseData}`,
-            'error'
-          )
-        }
-
-        console.log(selectedFiles)
-
-
-      } else {
-        console.log("Canceled the delete!");
-      }
-    } catch (error) {
-      console.log("Failed to call function!!!");
-
-      console.log('Error:', error);
-      if (error.response) {
-        console.log('Response Status:', error.response.status);
-        console.log('Response Data:', error.response.text());
-      }
-    }
-  }
-
-*/
 
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleCheckboxChange = (event, fileId) => {
     if (event.target.checked) {
-      setSelectedFiles(prevSelectedFiles => [...prevSelectedFiles, fileId]);//change ...prevSelectedFiles to selectedFiles
+      setSelectedFiles(prevSelectedFiles => [...prevSelectedFiles, fileId]);
     } else {
       setSelectedFiles(prevSelectedFiles => prevSelectedFiles.filter(id => id !== fileId));
     }
   };
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  
+  
 
-  const openFileInNewPage = async (fileId) => {
-    console.log("open file click")
-    // window.open(filePath, '_blank');
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
+
+  const openFileAndDownload = async (contentType, fileName, file_ID) => {
     try {
-
-      var myHeaders = new Headers();
-      myHeaders.append("Authorization", `Bearer ${storedToken}`);
-
-      var requestOptions = {
+      const response = await fetch(`${url_}/openfile/${file_ID}`, {
         method: 'GET',
-        headers: myHeaders,
-        redirect: 'follow'
-      };
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
 
-      fetch(`${url_}/openfile/${fileId}`, requestOptions)
-        .then(response => response.blob())
-        .then(blob => {
-          const url = URL.createObjectURL(blob);
-          const newTab = window.open(url, '_blank');
-          newTab.focus();
-        })
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const fileBlob = new Blob([arrayBuffer], { type: `application/${contentType}` });
+      const blobUrl = URL.createObjectURL(fileBlob);
+
+      if (contentType === 'pdf') {
+        setPdfBlobUrl(blobUrl);
+        const pdfWindow = window.open(blobUrl, '_blank');
+        pdfWindow.addEventListener('beforeunload', () => {
+          URL.revokeObjectURL(blobUrl);
+        });
+      } else if (contentType === 'xlsx') {
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(blobUrl);
+      }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error(`Error fetching or downloading ${contentType.toUpperCase()} file:`, error);
     }
   };
 
+
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////
   return (
 
     <div className="container">
@@ -393,14 +263,14 @@ const FileDownload = () => {
                 <div className="col">
                   <h1><b>Income Tax</b></h1>
                 </div>
-                <div className="col">
-{/*
+              {/*  <div className="col">
+
                   <label className={`${style.switch}`}>
-                    <input type="checkbox" checked={fileResponse} onChange={handleToggle} />
+                     <input type="checkbox" checked={fileResponse} onChange={handleToggle} />
                     <span className={`${style.slider} ${style.round}`}></span>
-                  </label>
-                */}
-                </div>
+                  </label>  
+
+                </div>*/}
               </div>
               <h6 className={`${style.headpara}`}>A.Y {year}</h6>
             </div>
@@ -411,11 +281,19 @@ const FileDownload = () => {
                 <div className="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6" id="select">
                   <button type="button" className="btn btn-danger" onClick={toggleCodeVisibility}>Select</button>
                 </div>
-               {/* <div className="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3" id="delet">
-                  <h2 className="icons"><i className="fa-solid fa-trash-can" onClick={DeleteFile}></i></h2>
-                </div> */}
+                <div className="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3" id="delet">
+                  <h2 className="icons">
+                   {/*} {codeVisible && (
+                      <i className="fa-solid fa-trash-can" onClick={DeleteFile}></i>
+                    )}   */}
+                  </h2>
+                </div>
                 <div className="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3" id="share">
-                  <h2 className="icons"><i className="fa-solid fa-share-from-square" ></i></h2>
+                  <h2 className="icons">
+                    {codeVisible && (
+                      <i className="fa-solid fa-share-from-square" ></i>
+                    )}
+                  </h2>
                 </div>
               </div>
             </div>
@@ -444,9 +322,9 @@ const FileDownload = () => {
                           )}
 
                           {item.filename.toLowerCase().includes('excel') ? (
-                            <i className="bi bi-file-earmark-excel-fill text-success" onDoubleClick={() => openFileInNewPage(item.fileId)}></i>
+                            <i className="bi bi-file-earmark-excel-fill text-success" onDoubleClick={() => openFileAndDownload('xlsx', 'spreadsheet.xlsx', item.fileId)}></i>
                           ) : (
-                            <i className="bi bi-file-earmark-pdf-fill text-danger" onDoubleClick={() => openFileInNewPage(item.fileId)}></i>
+                            <i className="bi bi-file-earmark-pdf-fill text-danger" onDoubleClick={() => openFileAndDownload('pdf', 'document.pdf', item.fileId)}></i>
                           )}
 
                           <h6 className={style.filename_text} >
@@ -457,7 +335,8 @@ const FileDownload = () => {
 
 
                     ) : (
-                      <div>{/* */}</div>
+                      <div >
+                      </div>
                     )}
                   </div>
                 ))}
@@ -475,12 +354,4 @@ const FileDownload = () => {
 
 export default FileDownload;
 
-
-
-
-
-
-
-
-///////////////////////////////
 

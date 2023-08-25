@@ -7,8 +7,7 @@ import { url_ } from '../Config';
 import { useLocation } from 'react-router-dom';
 
 function PasswordCheck() {
-  //const  isPassNull  = useLocation().state.isPasswordNull;
- 
+  //const  isPassNull  = useLocation().state.isPasswordNull; 
  const  isPassNull  = false;  
  //console.log("password ",isPassNull)
 
