@@ -40,6 +40,7 @@ h1 {
   color: #14c511;
   text-shadow: 1px 2px 2px #666666;
   margin-right: 30px;
+  font-size: 2rem;
 }
 
 p {
@@ -88,7 +89,11 @@ p {
   border-radius: 50px;
   margin: 3px;
 }
-
+.btns{
+  width: 7rem;
+  height: 2.1rem;
+  border-radius: 15px;
+}
 input:checked+.button {
   background-color: #14c511;
 
@@ -233,7 +238,7 @@ input:checked+.slider:before {
 
 .file_upload {
   background-color: #ffffff;
-  width: 211px;
+  width: 100%;
   margin: 0 auto;
   padding: 20px;
 }
@@ -283,11 +288,12 @@ input:checked+.slider:before {
 .filename_text {
   text-align: center;
   margin: 10px 0px;
+  width: 100%;
 }
 
 .file_upload i {
   color: red;
-  font-size: 8em;
+  font-size: 4rem;
   display: flex;
   justify-content: center;
 }
