@@ -139,7 +139,7 @@ const handleSetPassword = async () => {
     <div className={`${style.maincontainer}`}>
       {/* Header */}
       <div className={`${style.header}`}>
-        <a href="previous link" className={`${style.welcome}`}>
+        <a href="previous link" id={`${style.welcome}`}>
           &lt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Welcome to
         </a>
         <h2>TAXKO</h2>
@@ -181,28 +181,28 @@ const handleSetPassword = async () => {
         <button type="button" className={`${style.login}`} onClick={handleButtonClick}>
         {isPasswordNull ? "Set Password" : "Login"}
         </button>
-        <a href="previous link" className={`${style.forgot}`}>
+        <a href="previous link" id={`${style.forgot}`}>
           <u>Forgot Password?</u>
         </a>
       </div>
 
       {/* Copyright */}
       <div className={`${style.copyright}`}>
-        <a href="previous link" className={`${style.devs}`}>
+        <a href="previous link" id={`${style.devs}`}>
           Developed & Managed by
         </a>
-        <img src={arkonet} alt="" className={`${style.arkonet}`} />
-        <a href="previous link" className={`${style.social}`}>
+        <img src={arkonet} alt="" id={`${style.arkonet}`} />
+        <a href="previous link" id={`${style.social}`}>
           Follow us on
         </a>
         <div className={`${style.handles}`}>
-          <a href="previous link" className={`${style.instagram}`}>
+          <a href="previous link" id={`${style.instagram}`}>
             <i className="fa-brands fa-instagram" style={{ color: "#05022c" }}></i>
           </a>
-          <a href="previous link" className={`${style.twitter}`}>
+          <a href="previous link" id={`${style.twitter}`}>
             <i className="fa-brands fa-twitter" style={{ color: "#05022c" }}></i>
           </a>
-          <a href="previous link" className={`${style.facebook}`}>
+          <a href="previous link" id={`${style.facebook}`}>
             <i className="fa-brands fa-facebook-f" style={{ color: "#05022c" }}></i>
           </a>
         </div>
