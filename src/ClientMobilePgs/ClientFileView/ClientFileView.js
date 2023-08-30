@@ -1,13 +1,14 @@
+
 import React, { useEffect, useState } from 'react';
 import style from "./ClientFileView.module.css";
-import Swal from 'sweetalert2';
 import { url_ } from '../../Config';
 import { useLocation } from 'react-router-dom';
 
 const ClientFileView = () => {
 
-const  id  = useLocation().state.clientid;
-  const user_id = window.localStorage.getItem('user_id');
+//const  id  = useLocation().state.clientid;
+  const client_id = window.localStorage.getItem('client_id');
+  const user_id= window.localStorage.getItem('userid');
   const storedToken = window.localStorage.getItem('jwtToken');
   const  year  = useLocation().state.year;
  // console.log(year,id)
@@ -34,7 +35,7 @@ const  id  = useLocation().state.clientid;
   const fetchData = async () => {
     try {
       await getFile();
-      await GetFileResponse();
+     // await GetFileResponse();
 
     } catch (error) {
       console.error('An error occurred:', error);
@@ -51,31 +52,40 @@ const  id  = useLocation().state.clientid;
 
   const getFile = async () => {
    
-    const myHeaders = new Headers();
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${storedToken}`);
-
-    const requestOptions = {
-      method: 'GET',
+    
+    var raw = JSON.stringify({
+      "clientid": client_id,
+      "accountyear": year
+    });
+    
+    var requestOptions = {
+      method: 'POST',
       headers: myHeaders,
+      body: raw,
       redirect: 'follow'
     };
+    
+    fetch(`${url_}/client/files`, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        
+        console.log(data)
+        const extractedNames = data.map(file => {
+          const fileid = file.id;
+          const filePath = file.filePath;
+          const parts = file.fileName.split(`${user_id}_${client_id}_${year}_`);
+          const extractedName = parts[1].split('.pdf')[0];
+          return { fileid, extractedName, filePath };
+        });
+        setDbfilename(extractedNames);
+      
+      })
+      .catch(error => console.log('error', error));
 
-    try {
-      const response = await fetch(`${url_}/getfile/${user_id}/${id}/${year}`, requestOptions);
-      const data = await response.json();
-      console.log(data)
-      const extractedNames = data.map(file => {
-        const fileid = file.id;
-        const filePath = file.filePath;
-        const parts = file.fileName.split(`${user_id}_${id}_${year}_`);
-        const extractedName = parts[1].split('.pdf')[0];
-        return { fileid, extractedName, filePath };
-      });
-      setDbfilename(extractedNames);
 
-    } catch (error) {
-      console.error('An error occurred while fetching files:', error);
-    }
   };
 
 
@@ -91,45 +101,33 @@ const  id  = useLocation().state.clientid;
     }
   });
 
-  console.log("FileStatusArray",filenameStatusArray)
+ 
 
-
-
-
-
-
-
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //  Toggle Switch Code
-
-
-  const GetFileResponse = async () => {
+  // const GetFileResponse = async () => {
    
-    const myHeaders = new Headers();
-    myHeaders.append("Authorization", `Bearer ${storedToken}`);
+  //   const myHeaders = new Headers();
+  //   myHeaders.append("Authorization", `Bearer ${storedToken}`);
 
-    const requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow'
-    };
+  //   const requestOptions = {
+  //     method: 'GET',
+  //     headers: myHeaders,
+  //     redirect: 'follow'
+  //   };
 
-    try {
-      const response = await fetch(`${url_}/getfilednotfiled/${user_id}/${id}/${year}`, requestOptions);
-      const data = await response.json();
-      if (data[0].filednotfiled === "No") {
-        setFileResponse(false)
-        console.log(data[0].filednotfiled)
-      } else {
-        setFileResponse(true)
-      }
+  //   try {
+  //     const response = await fetch(`${url_}/getfilednotfiled/${user_id}/${client_id}/${year}`, requestOptions);
+  //     const data = await response.json();
+  //     if (data[0].filednotfiled === "No") {
+  //       setFileResponse(false)
+  //       console.log(data[0].filednotfiled)
+  //     } else {
+  //       setFileResponse(true)
+  //     }
 
-    } catch (error) {
-      console.error('An error occurred while fetching files:', error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('An error occurred while fetching files:', error);
+  //   }
+  // };
 
  
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,8 +196,8 @@ const  id  = useLocation().state.clientid;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   return (
-
-    <div className="container mt-3">
+<div className={`${style.outercontainer}`}>
+    <div className={`container mt-3 ${style.maincontainer}`}>
       <div className="row">
         <div className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" id="maindiv">
           <div className="container">
@@ -219,7 +217,7 @@ const  id  = useLocation().state.clientid;
                    
                   </h2>
                 </div>
-                <div className="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6" id="select">
+                <div className="col-5 col-sm-4 col-md-3 col-lg-2 col-xl-2" id="select">
                 <button type="button" className={`btn btn-danger ${style.btns}`} onClick={toggleCodeVisibility}>Select</button>
                 </div>
                 <div className="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3" id="share">
@@ -236,7 +234,7 @@ const  id  = useLocation().state.clientid;
 
                 {filenameStatusArray.map(item => (
                   <>
-                    {item.status && (
+                    {item.status && item.filename!=="Excel" &&(
                       <div className='col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6' key={item.fileId}>
                         <div className={style.file_upload}>
                           {codeVisible && (
@@ -274,7 +272,7 @@ const  id  = useLocation().state.clientid;
         </div>
       </div>
     </div >
-
+    </div>
   );
 }
 

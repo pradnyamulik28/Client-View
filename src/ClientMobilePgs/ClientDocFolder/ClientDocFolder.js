@@ -2,15 +2,14 @@
 import React from 'react';
 import styles from './ClientDocFolder.module.css';
 import { Link } from 'react-router-dom';
-import { url_ } from '../../Config';
+//import { url_ } from '../../Config';
 import {useLocation} from 'react-router-dom'
 
 
 const ClientDocFolder = () => {
   const  id  = useLocation().state.clientid; //Get Client Id parameter from route
   
-  const user_id = window.localStorage.getItem('user_id');
-  const storedToken = window.localStorage.getItem('jwtToken');
+
 
   function getLastFiveYears() {
     const currentYear = new Date().getFullYear();
@@ -32,7 +31,8 @@ const ClientDocFolder = () => {
 
 
   return (
-    <div className="container">
+    <div className={`${styles.outercontainer}`}>
+    <div className={`container mt-3 ${styles.maincontainer}`}>
       <div className="row" >
         <div className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mt-5" id={styles.maindiv}>
           <h1><b>Income Tax</b></h1>
@@ -60,6 +60,7 @@ const ClientDocFolder = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

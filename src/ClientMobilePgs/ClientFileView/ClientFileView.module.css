@@ -1,14 +1,36 @@
 /* * {
     border: 1PX solid red;
 } */
+
+/* html{
+  height: -webkit-fill-availabel;
+}
+body {
+  height: 100vh;
+  width: 100vw;
+  height: -webkit-fill-availabel;
+  margin: 0;
+  overflow: hidden;
+} */
+
 .container {
   margin: 5%;
 }
-
-body {
-  width: 100vw;
+.outercontainer{
   height: 100vh;
+  width: 100vw;
+  height: -webkit-fill-availabel;
+  margin: 0;
+  overflow: hidden;
 }
+
+.maincontainer{
+  height: 100vh;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+}
+
 
 a {
   text-decoration: none;
@@ -289,6 +311,7 @@ input:checked+.slider:before {
   text-align: center;
   margin: 10px 0px;
   width: 100%;
+  overflow-wrap: break-word;
 }
 
 .file_upload i {
